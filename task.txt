@@ -1,0 +1,83 @@
+# Title:
+Build an Agentic AI Hiring Assistant Web App using Langflow + Gemini API + React
+
+# Overview:
+This project is a web app where HR users can:
+- Upload a resume (PDF)
+- Paste a job description
+- View AI-generated:
+  - Match score (1–10)
+  - Candidate summary
+  - Interview invitation email
+
+The AI logic is powered by a Gemini-based agent built using Langflow.
+
+# Architecture:
+Frontend:
+- React with Tailwind CSS
+- Form with file upload and textarea input
+- Displays AI results with styling
+
+Backend:
+- Node.js (or Next.js API routes)
+- Parses PDF using `pdf-parse`
+- Sends resume + JD to Langflow (running Gemini)
+- Returns structured result
+
+Langflow Agent (running locally or remotely):
+- Input 1: Resume text
+- Input 2: Job description
+- PromptTemplate:
+  """
+  Compare the resume and job description. Return:
+  1. A match score from 1 to 10
+  2. A summary of strengths (3–4 lines)
+  3. A professional interview invitation email
+  Resume:
+  {{resume}}
+
+  Job Description:
+  {{jd}}
+  """
+- Output: JSON with score, summary, and email
+
+# Tasks:
+
+## 1. Project Initialization
+- Initialize a Next.js app
+- Install Tailwind CSS
+- Create folders:
+  - `/components`
+  - `/pages/api`
+  - `/utils`
+
+## 2. Frontend UI
+- Create a component `UploadForm`:
+  - PDF upload input
+  - Textarea for JD
+  - Submit button
+
+- Create `ResultCard` component:
+  - Shows: Score, Summary, Email (with copy button)
+
+## 3. Backend Logic (API)
+- In `/pages/api/analyze.js`:
+  - Parse uploaded PDF with `pdf-parse`
+  - Extract text
+  - Call Langflow's API with resume + JD
+
+## 4. Langflow Agent Setup
+- Build chain in Langflow:
+  - File loader → Prompt template → Gemini → Output
+- Use Gemini API:
+  - Endpoint: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+  - Use environment variable `GEMINI_API_KEY`
+
+## 5. Langflow Integration
+- Set Langflow server URL (e.g., `http://localhost:7860/api/predict`)
+- Send POST request from backend:
+```json
+{
+  "resume": "<resume text>",
+  "job_description": "<jd text>"
+}
