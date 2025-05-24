@@ -55,6 +55,7 @@ export default {
         'data-stream': 'data-stream 3s linear infinite',
         'holographic-interference': 'holographic-interference 2s ease-in-out infinite',
         'plasma-wave': 'plasma-wave 8s ease-in-out infinite',
+        'blob': 'blob 7s ease-in-out infinite',
       },
       keyframes: {
         'slide-up': {
@@ -255,15 +256,57 @@ export default {
             opacity: '0.8',
           },
         },
+        'blob': {
+          '0%': {
+            transform: 'translate(0px, 0px) scale(1)',
+          },
+          '33%': {
+            transform: 'translate(30px, -50px) scale(1.1)',
+          },
+          '66%': {
+            transform: 'translate(-20px, 20px) scale(0.9)',
+          },
+          '100%': {
+            transform: 'translate(0px, 0px) scale(1)',
+          },
+        },
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+      },
+      animationDelay: {
+        '2000': '2s',
+        '4000': '4s',
       },
       backdropBlur: {
         'xs': '2px',
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function({ addUtilities }) {
+      const newUtilities = {
+        '.scrollbar-hide': {
+          /* Hide scrollbar for IE, Edge and Firefox */
+          '-ms-overflow-style': 'none',
+          'scrollbar-width': 'none',
+          /* Hide scrollbar for Chrome, Safari and Opera */
+          '&::-webkit-scrollbar': {
+            'display': 'none'
+          }
+        },
+        '.scrollbar-none': {
+          /* Hide scrollbar for IE, Edge and Firefox */
+          '-ms-overflow-style': 'none',
+          'scrollbar-width': 'none',
+          /* Hide scrollbar for Chrome, Safari and Opera */
+          '&::-webkit-scrollbar': {
+            'display': 'none'
+          }
+        }
+      }
+      addUtilities(newUtilities)
+    }
+  ],
 };
