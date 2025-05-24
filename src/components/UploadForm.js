@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import JobDescriptionGenerator from "./JobDescriptionGenerator";
 
 export default function UploadForm({ onSubmit, loading }) {
   const [file, setFile] = useState(null);
@@ -15,6 +16,7 @@ export default function UploadForm({ onSubmit, loading }) {
   const [readabilityScore, setReadabilityScore] = useState(0);
   const [suggestions, setSuggestions] = useState([]);
   const [completionPercentage, setCompletionPercentage] = useState(0);
+  const [showJobGenerator, setShowJobGenerator] = useState(false);
   const fileInputRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
@@ -285,8 +287,7 @@ export default function UploadForm({ onSubmit, loading }) {
         setFocusedField(null);
       }, 500);
     }, 1200); // Realistic processing time
-  }, []);
-  const handleFileChange = useCallback(
+  }, []);  const handleFileChange = useCallback(
     (e) => {
       if (e.target.files && e.target.files.length > 0) {
         handleFileSelection(e.target.files[0]);
@@ -294,6 +295,26 @@ export default function UploadForm({ onSubmit, loading }) {
     },
     [handleFileSelection]
   );
+
+  // Job Description Generator handlers
+  const handleJobDescriptionGenerated = useCallback((generatedDescription) => {
+    setJobDescription(generatedDescription);
+    setShowJobGenerator(false);
+    setFocusedField('jobDescription');
+    
+    // Clear any existing errors
+    if (errors.jobDescription) {
+      setErrors((prev) => ({ ...prev, jobDescription: null }));
+    }
+  }, [errors.jobDescription]);
+
+  const openJobGenerator = useCallback(() => {
+    setShowJobGenerator(true);
+  }, []);
+
+  const closeJobGenerator = useCallback(() => {
+    setShowJobGenerator(false);
+  }, []);
 
   // Quick actions for better UX
   const clearFile = useCallback(() => {
@@ -709,8 +730,7 @@ export default function UploadForm({ onSubmit, loading }) {
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full flex items-center justify-center">
                 <span className="text-xs font-bold text-white">💼</span>
               </div>
-            </div>
-            <div className="flex-1">
+            </div>            <div className="flex-1">
               <h3 className="text-xl font-bold text-white group-hover:text-purple-300 transition-colors flex items-center">
                 Job Description
                 <span className="ml-2 text-sm font-normal text-slate-400">
@@ -721,13 +741,33 @@ export default function UploadForm({ onSubmit, loading }) {
                 Detailed requirements and responsibilities
               </p>
             </div>
-            {jobDescription.length >= 50 && (
-              <div className="bg-green-500/20 border border-green-400/30 rounded-xl px-3 py-1">
-                <span className="text-xs font-semibold text-green-300">
-                  ✓ Ready
-                </span>
-              </div>
-            )}
+            
+            <div className="flex items-center space-x-3">
+              {/* AI Generate Button */}
+              {!jobDescription.trim() && (
+                <button
+                  type="button"
+                  onClick={openJobGenerator}
+                  className="group/btn relative bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold py-2 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center space-x-2"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-purple-400/20 rounded-xl blur-lg group-hover/btn:blur-xl transition-all duration-300"></div>
+                  <div className="relative flex items-center space-x-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <span className="text-sm">Generate with AI</span>
+                  </div>
+                </button>
+              )}
+              
+              {jobDescription.length >= 50 && (
+                <div className="bg-green-500/20 border border-green-400/30 rounded-xl px-3 py-1">
+                  <span className="text-xs font-semibold text-green-300">
+                    ✓ Ready
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="relative">
@@ -1358,10 +1398,16 @@ The more detailed your job description, the more accurate our AI analysis will b
                   ))}
                 </div>
               </div>
-            </div>
-          )}
+            </div>          )}
         </div>
       </form>
+      
+      {/* Job Description Generator Modal */}
+      <JobDescriptionGenerator 
+        isVisible={showJobGenerator}
+        onGenerate={handleJobDescriptionGenerated}
+        onCancel={closeJobGenerator}
+      />
     </div>
   );
 }
