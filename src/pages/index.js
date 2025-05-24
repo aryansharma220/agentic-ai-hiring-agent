@@ -72,72 +72,189 @@ export default function Home() {
         
         {/* Enhanced Main Analysis Section */}
         <section id="analyze" className="relative py-32 px-4 sm:px-6 lg:px-8 overflow-hidden">
-          {/* Advanced Background Effects */}
+          {/* Multi-Layer Advanced Background Effects */}
           <div className="absolute inset-0">
-            {/* Primary gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/50 via-purple-900/30 to-slate-900/60"></div>
+            {/* Base gradient with improved depth - darker version */}
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-950/95 via-indigo-950/90 to-slate-950/98"></div>
             
-            {/* Dynamic particle system */}
+            {/* Animated gradient overlay - more subtle */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/8 via-transparent via-purple-600/6 to-cyan-600/10 animate-gradient-shift"></div>
+            
+            {/* Dynamic mesh background - reduced opacity */}
+            <div className="absolute inset-0 opacity-15">
+              <div 
+                className="w-full h-full bg-gradient-to-br from-transparent via-blue-500/5 to-transparent"
+                style={{
+                  backgroundImage: `
+                    radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+                    radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+                    radial-gradient(circle at 25% 75%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
+                    radial-gradient(circle at 75% 25%, rgba(168, 85, 247, 0.08) 0%, transparent 50%)
+                  `,
+                  animation: 'mesh-drift 20s ease-in-out infinite'
+                }}
+              />
+            </div>
+            
+            {/* Enhanced particle system with multiple layers - darker particles */}
             <div className="absolute inset-0">
-              {[...Array(40)].map((_, i) => (
+              {/* Large ambient particles */}
+              {[...Array(25)].map((_, i) => (
                 <div
-                  key={`particle-${i}`}
-                  className="absolute rounded-full animate-cosmic-drift opacity-40"
+                  key={`large-particle-${i}`}
+                  className="absolute rounded-full animate-cosmic-drift opacity-15"
                   style={{
-                    width: `${1 + Math.random() * 3}px`,
-                    height: `${1 + Math.random() * 3}px`,
+                    width: `${3 + Math.random() * 6}px`,
+                    height: `${3 + Math.random() * 6}px`,
                     left: `${Math.random() * 100}%`,
                     top: `${Math.random() * 100}%`,
                     background: `radial-gradient(circle, 
-                      hsl(${200 + Math.random() * 80}, 70%, 60%) 0%, 
+                      hsl(${200 + Math.random() * 80}, 60%, 50%) 0%, 
+                      hsl(${200 + Math.random() * 80}, 40%, 30%) 40%,
                       transparent 70%)`,
-                    animationDelay: `${Math.random() * 10}s`,
-                    animationDuration: `${8 + Math.random() * 15}s`
+                    animationDelay: `${Math.random() * 15}s`,
+                    animationDuration: `${12 + Math.random() * 20}s`,
+                    boxShadow: `0 0 ${1 + Math.random() * 2}px hsl(${200 + Math.random() * 80}, 50%, 40%)`
+                  }}
+                />
+              ))}
+              
+              {/* Medium particles */}
+              {[...Array(35)].map((_, i) => (
+                <div
+                  key={`medium-particle-${i}`}
+                  className="absolute rounded-full animate-cosmic-drift opacity-20"
+                  style={{
+                    width: `${1.5 + Math.random() * 3}px`,
+                    height: `${1.5 + Math.random() * 3}px`,
+                    left: `${Math.random() * 100}%`,
+                    top: `${Math.random() * 100}%`,
+                    background: `radial-gradient(circle, 
+                      hsl(${180 + Math.random() * 100}, 55%, 45%) 0%, 
+                      transparent 70%)`,
+                    animationDelay: `${Math.random() * 12}s`,
+                    animationDuration: `${8 + Math.random() * 16}s`
+                  }}
+                />
+              ))}
+              
+              {/* Small sparkling particles */}
+              {[...Array(50)].map((_, i) => (
+                <div
+                  key={`small-particle-${i}`}
+                  className="absolute rounded-full animate-twinkle opacity-25"
+                  style={{
+                    width: `${0.5 + Math.random() * 1.5}px`,
+                    height: `${0.5 + Math.random() * 1.5}px`,
+                    left: `${Math.random() * 100}%`,
+                    top: `${Math.random() * 100}%`,
+                    background: `hsl(${200 + Math.random() * 80}, 70%, 60%)`,
+                    animationDelay: `${Math.random() * 8}s`,
+                    animationDuration: `${2 + Math.random() * 6}s`
                   }}
                 />
               ))}
             </div>
 
-            {/* Neural network overlay */}
-            <svg className="absolute inset-0 w-full h-full opacity-20">
-              <defs>
-                <linearGradient id="analysis-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.8"/>
-                  <stop offset="50%" stopColor="#8b5cf6" stopOpacity="0.6"/>
-                  <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.8"/>
-                </linearGradient>
-                
-                <pattern id="analysis-grid" width="100" height="100" patternUnits="userSpaceOnUse">
-                  <circle cx="50" cy="50" r="2" fill="url(#analysis-gradient)" opacity="0.6"/>
-                  <path d="M 100 0 L 0 0 0 100" fill="none" stroke="url(#analysis-gradient)" strokeWidth="0.5" opacity="0.3"/>
-                </pattern>
-              </defs>
-              
-              <rect width="100%" height="100%" fill="url(#analysis-grid)" />
-              
-              {/* Dynamic connection lines */}
-              {[...Array(15)].map((_, i) => (
-                <line
-                  key={`connection-${i}`}
-                  x1={`${(i * 7) % 100}%`}
-                  y1={`${(i * 11) % 100}%`}
-                  x2={`${((i + 2) * 7) % 100}%`}
-                  y2={`${((i + 3) * 11) % 100}%`}
-                  stroke="url(#analysis-gradient)"
-                  strokeWidth="1"
-                  className="animate-neural-scan"
-                  style={{ 
-                    animationDelay: `${i * 0.4}s`,
-                    animationDuration: `${4 + (i % 3)}s`
+        
+
+            {/* Simplified flowing data streams */}
+            <div className="absolute inset-0 overflow-hidden">
+              {/* Minimal horizontal flowing streams */}
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={`flow-horizontal-${i}`}
+                  className="absolute h-px bg-gradient-to-r from-transparent via-blue-400/25 to-transparent animate-connection-flow"
+                  style={{
+                    top: `${25 + i * 25}%`,
+                    left: '-100%',
+                    width: '200%',
+                    animationDelay: `${i * 2}s`,
+                    animationDuration: `${8 + (i % 2)}s`
                   }}
                 />
               ))}
-            </svg>
+              
+              {/* Minimal vertical flowing streams */}
+              {[...Array(2)].map((_, i) => (
+                <div
+                  key={`flow-vertical-${i}`}
+                  className="absolute w-px bg-gradient-to-b from-transparent via-purple-400/25 to-transparent animate-connection-flow"
+                  style={{
+                    left: `${30 + i * 40}%`,
+                    top: '-100%',
+                    height: '200%',
+                    animationDelay: `${i * 3 + 1}s`,
+                    animationDuration: `${10 + i}s`
+                  }}
+                />
+              ))}
+            </div>
 
-            {/* Floating geometric elements */}
-            <div className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-br from-blue-500/10 via-cyan-500/15 to-purple-500/10 rounded-3xl animate-dimensional-shift blur-2xl"></div>
-            <div className="absolute bottom-32 right-32 w-24 h-24 bg-gradient-to-tr from-purple-500/15 via-pink-500/10 to-indigo-500/15 rotate-45 animate-quantum-phase blur-xl" style={{ animationDelay: '3s' }}></div>
-            <div className="absolute top-1/3 right-1/4 w-16 h-16 bg-gradient-to-r from-teal-500/20 to-emerald-500/15 rounded-full animate-energy-wave blur-sm" style={{ animationDelay: '1.5s' }}></div>
+            {/* Dynamic floating geometric elements - darker opacity */}
+            <div className="absolute inset-0">
+              {/* Large morphing shapes */}
+              <div className="absolute top-16 left-16 w-40 h-40 bg-gradient-to-br from-blue-500/8 via-cyan-500/10 to-purple-500/8 rounded-3xl animate-morph-shape blur-3xl"></div>
+              <div className="absolute bottom-20 right-20 w-32 h-32 bg-gradient-to-tr from-purple-500/10 via-pink-500/8 to-indigo-500/10 rotate-45 animate-quantum-rotation blur-2xl" style={{ animationDelay: '2s' }}></div>
+              <div className="absolute top-1/2 left-10 w-24 h-24 bg-gradient-to-r from-teal-500/12 to-emerald-500/10 rounded-full animate-energy-pulse blur-xl" style={{ animationDelay: '1s' }}></div>
+              
+              {/* Medium floating elements */}
+              <div className="absolute top-1/4 right-1/3 w-20 h-20 bg-gradient-to-bl from-cyan-400/10 to-blue-600/8 rounded-2xl animate-float-drift" style={{ animationDelay: '3s' }}></div>
+              <div className="absolute bottom-1/3 left-1/4 w-16 h-16 bg-gradient-to-tr from-violet-500/12 to-purple-400/10 rotate-12 animate-gentle-spin" style={{ animationDelay: '4s' }}></div>
+              
+              {/* Small accent elements */}
+              <div className="absolute top-3/4 right-1/4 w-8 h-8 bg-gradient-to-r from-emerald-400/15 to-teal-400/12 rounded-full animate-bounce-soft" style={{ animationDelay: '2.5s' }}></div>
+            </div>
+
+            {/* Elegant circle animations */}
+            <div className="absolute inset-0 overflow-hidden">
+              {/* Large pulsing circle */}
+              <div 
+                className="absolute w-96 h-96 rounded-full border border-blue-400/20 animate-circle-pulse"
+                style={{
+                  top: '20%',
+                  left: '60%',
+                  transform: 'translate(-50%, -50%)',
+                  animationDuration: '8s'
+                }}
+              ></div>
+              
+              {/* Medium rotating circle */}
+              <div 
+                className="absolute w-64 h-64 rounded-full border-2 border-purple-400/15 animate-circle-rotate"
+                style={{
+                  bottom: '30%',
+                  left: '20%',
+                  transform: 'translate(-50%, 50%)',
+                  animationDuration: '12s'
+                }}
+              ></div>
+              
+              {/* Small breathing circle */}
+              <div 
+                className="absolute w-32 h-32 rounded-full bg-gradient-to-r from-cyan-400/10 to-transparent animate-circle-breathe"
+                style={{
+                  top: '70%',
+                  right: '15%',
+                  transform: 'translate(50%, -50%)',
+                  animationDuration: '6s'
+                }}
+              ></div>
+            </div>
+
+            {/* Simplified ambient light beams */}
+            <div className="absolute inset-0 overflow-hidden">
+              {/* Primary vertical beams - reduced count */}
+              <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-blue-400/30 to-transparent animate-light-beam" style={{ animationDelay: '1s' }}></div>
+              <div className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-transparent via-purple-400/30 to-transparent animate-light-beam" style={{ animationDelay: '4s' }}></div>
+              
+              {/* Primary horizontal beams - reduced count */}
+              <div className="absolute top-1/3 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-400/25 to-transparent animate-light-beam-horizontal" style={{ animationDelay: '2s' }}></div>
+              <div className="absolute top-2/3 left-0 w-full h-px bg-gradient-to-r from-transparent via-violet-400/25 to-transparent animate-light-beam-horizontal" style={{ animationDelay: '6s' }}></div>
+            </div>
+
+            {/* Depth layers for 3D effect - darker */}
+            <div className="absolute inset-0 bg-gradient-radial from-transparent via-slate-950/15 to-slate-950/25 animate-depth-breathing"></div>
           </div>
 
           {/* Main content container */}
