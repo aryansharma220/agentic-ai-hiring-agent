@@ -324,76 +324,387 @@ export default function Home() {
               ) : (
                 <div className="lg:mt-0 mt-12 animate-slide-up delay-400">
                   <div className="relative group">
-                    {/* Enhanced waiting state card */}
-                    <div className="bg-gradient-to-br from-white/10 via-white/5 to-transparent backdrop-blur-2xl rounded-3xl border border-white/20 p-12 text-center hover:border-white/40 transition-all duration-700 overflow-hidden">
-                      {/* Animated background pattern */}
-                      <div className="absolute inset-0 opacity-20">
-                        <div className="w-full h-full bg-gradient-to-br from-blue-500/20 via-purple-500/10 to-pink-500/20 animate-gradient-enhanced"></div>
-                      </div>
+                    {/* Premium Analysis Ready Card */}
+                    <div className="relative bg-gradient-to-br from-slate-900/95 via-indigo-950/85 to-slate-900/95 backdrop-blur-3xl rounded-3xl border border-white/10 overflow-hidden hover:border-white/30 transition-all duration-700 shadow-2xl shadow-blue-500/10">
                       
-                      {/* Content */}
-                      <div className="relative z-10">
-                        <div className="relative mb-8">
-                          <div className="w-32 h-32 mx-auto bg-gradient-to-br from-blue-500/30 via-purple-500/20 to-cyan-500/30 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-500 shadow-2xl shadow-blue-500/20">
-                            <svg className="w-16 h-16 text-white animate-depth-float" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                            </svg>
-                            {/* Icon glow effect */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/30 via-purple-500/20 to-cyan-500/30 rounded-full blur-xl opacity-60 group-hover:opacity-80 transition-opacity duration-500 -z-10 animate-pulse"></div>
-                          </div>
-                          
-                          {/* Orbital particles around icon */}
-                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                            {[...Array(6)].map((_, i) => (
-                              <div
-                                key={i}
-                                className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full animate-particle-orbital opacity-60"
-                                style={{
-                                  animationDelay: `${i * 0.8}s`,
-                                  animationDuration: '8s'
-                                }}
-                              />
-                            ))}
-                          </div>
+                      {/* Multi-layer background effects */}
+                      <div className="absolute inset-0">
+                        {/* Primary gradient overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/25 via-purple-600/20 to-cyan-600/25 animate-gradient-shift"></div>
+                        
+                        {/* Hexagonal pattern overlay */}
+                        <div className="absolute inset-0 opacity-20">
+                          <div className="w-full h-full"
+                            style={{
+                              backgroundImage: `
+                                radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
+                                radial-gradient(circle at 75% 25%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
+                                radial-gradient(circle at 25% 75%, rgba(34, 211, 238, 0.3) 0%, transparent 50%),
+                                radial-gradient(circle at 75% 75%, rgba(236, 72, 153, 0.3) 0%, transparent 50%),
+                                conic-gradient(from 0deg at 50% 50%, rgba(59, 130, 246, 0.1) 0deg, transparent 90deg, rgba(139, 92, 246, 0.1) 180deg, transparent 270deg)
+                              `,
+                              animation: 'mesh-drift 20s ease-in-out infinite'
+                            }}
+                          ></div>
                         </div>
                         
-                        <h3 className="text-3xl font-bold text-white mb-4 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400 group-hover:bg-clip-text transition-all duration-500">
-                          Analysis Ready
-                        </h3>
-                        
-                        <p className="text-xl text-slate-300 leading-relaxed mb-6 group-hover:text-slate-200 transition-colors duration-500">
-                          Upload your resume and job description to unlock detailed AI-powered insights and compatibility analysis
-                        </p>
-                        
-                        {/* Feature highlights */}
-                        <div className="grid grid-cols-2 gap-4 mt-8">
-                          {[
-                            { icon: '🧠', label: 'AI Analysis' },
-                            { icon: '⚡', label: 'Instant Results' },
-                            { icon: '🎯', label: 'Precision Match' },
-                            { icon: '🔒', label: 'Secure Process' }
-                          ].map((feature, index) => (
-                            <div key={index} className="flex items-center space-x-2 text-slate-400 group-hover:text-slate-300 transition-colors duration-500">
-                              <span className="text-lg">{feature.icon}</span>
-                              <span className="font-medium">{feature.label}</span>
+                        {/* Enhanced particle layer with floating elements */}
+                        <div className="absolute inset-0">
+                          {[...Array(12)].map((_, i) => (
+                            <div
+                              key={`card-particle-${i}`}
+                              className="absolute rounded-full animate-twinkle"
+                              style={{
+                                width: `${2 + Math.random() * 4}px`,
+                                height: `${2 + Math.random() * 4}px`,
+                                left: `${15 + Math.random() * 70}%`,
+                                top: `${15 + Math.random() * 70}%`,
+                                background: `hsl(${200 + Math.random() * 80}, 80%, 65%)`,
+                                opacity: 0.6,
+                                animationDelay: `${Math.random() * 4}s`,
+                                animationDuration: `${2 + Math.random() * 6}s`,
+                                boxShadow: `0 0 ${4 + Math.random() * 8}px currentColor`
+                              }}
+                            />
+                          ))}
+                          
+                          {/* Floating geometric shapes */}
+                          {[...Array(6)].map((_, i) => (
+                            <div
+                              key={`floating-shape-${i}`}
+                              className="absolute opacity-20 animate-float"
+                              style={{
+                                left: `${20 + (i * 12)}%`,
+                                top: `${30 + Math.random() * 40}%`,
+                                animationDelay: `${i * 0.8}s`,
+                                animationDuration: `${4 + Math.random() * 4}s`
+                              }}
+                            >
+                              <div className={`w-3 h-3 ${i % 3 === 0 ? 'rotate-45' : i % 3 === 1 ? 'rounded-full' : 'rotate-12'} bg-gradient-to-r from-blue-400/30 to-purple-400/30 blur-sm`}></div>
                             </div>
                           ))}
                         </div>
+                        
+                        {/* Animated circuit pattern */}
+                        <div className="absolute inset-0 opacity-10">
+                          <svg width="100%" height="100%" viewBox="0 0 400 300" className="absolute inset-0">
+                            <defs>
+                              <linearGradient id="circuit-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.8"/>
+                                <stop offset="50%" stopColor="#8b5cf6" stopOpacity="0.6"/>
+                                <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.8"/>
+                              </linearGradient>
+                            </defs>
+                            
+                            <g stroke="url(#circuit-gradient)" strokeWidth="1" fill="none" className="animate-pulse" style={{animationDuration: '3s'}}>
+                              <path d="M50 50 L150 50 L150 100 L250 100 L250 150" className="animate-pulse" style={{animationDelay: '0s'}}/>
+                              <path d="M100 200 L200 200 L200 120 L300 120" className="animate-pulse" style={{animationDelay: '1s'}}/>
+                              <path d="M80 250 L180 250 L180 180 L280 180 L280 80" className="animate-pulse" style={{animationDelay: '2s'}}/>
+                              
+                              <circle cx="150" cy="50" r="3" fill="url(#circuit-gradient)" className="animate-ping" style={{animationDelay: '0.5s'}}/>
+                              <circle cx="250" cy="100" r="3" fill="url(#circuit-gradient)" className="animate-ping" style={{animationDelay: '1.5s'}}/>
+                              <circle cx="200" cy="200" r="3" fill="url(#circuit-gradient)" className="animate-ping" style={{animationDelay: '2.5s'}}/>
+                            </g>
+                          </svg>
+                        </div>
+                      </div>
+
+                      {/* Main content */}
+                      <div className="relative z-10 p-12 text-center">
+                        
+                        {/* Enhanced icon section */}
+                        <div className="relative mb-12">
+                          {/* Main icon container */}
+                          <div className="relative w-40 h-40 mx-auto">
+                            {/* Outer pulsing ring */}
+                            <div className="absolute inset-0 rounded-full border-2 border-blue-400/20 animate-spin shadow-lg shadow-blue-500/20" style={{ animationDuration: '25s' }}>
+                              <div className="absolute inset-2 rounded-full border border-purple-400/30 animate-pulse"></div>
+                            </div>
+                            
+                            {/* Middle rotating ring with enhanced gradient */}
+                            <div className="absolute inset-3 rounded-full border-2 border-transparent bg-gradient-to-r from-blue-500/40 via-purple-500/40 to-cyan-500/40 animate-spin shadow-xl shadow-purple-500/30" 
+                                 style={{ 
+                                   animationDuration: '18s', 
+                                   animationDirection: 'reverse',
+                                   backgroundClip: 'padding-box',
+                                   borderImage: 'linear-gradient(45deg, rgba(59, 130, 246, 0.6), rgba(139, 92, 246, 0.6), rgba(6, 182, 212, 0.6)) 1'
+                                 }}>
+                              <div className="absolute inset-1 rounded-full bg-slate-900/80 backdrop-blur-sm"></div>
+                            </div>
+                            
+                            {/* Inner circle with enhanced effects */}
+                            <div className="absolute inset-6 bg-gradient-to-br from-blue-500/50 via-purple-500/40 to-cyan-500/50 rounded-full flex items-center justify-center group-hover:scale-110 transition-all duration-700 shadow-2xl shadow-blue-500/40 hover:shadow-purple-500/50">
+                              {/* Enhanced Brain/AI icon with animation */}
+                              <div className="relative">
+                                <svg className="w-14 h-14 text-white animate-pulse z-10 relative" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.5))'}}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                </svg>
+                                
+                                {/* Animated neural connections around the brain */}
+                                <div className="absolute inset-0">
+                                  {[...Array(6)].map((_, i) => (
+                                    <div
+                                      key={`neural-${i}`}
+                                      className="absolute w-1 h-1 bg-blue-400 rounded-full animate-ping"
+                                      style={{
+                                        top: `${30 + Math.sin(i * Math.PI / 3) * 20}%`,
+                                        left: `${50 + Math.cos(i * Math.PI / 3) * 25}%`,
+                                        animationDelay: `${i * 0.3}s`,
+                                        animationDuration: '2s'
+                                      }}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                              
+                              {/* Enhanced central glow with multiple layers */}
+                              <div className="absolute inset-0 bg-gradient-to-br from-blue-400/30 via-purple-400/20 to-cyan-400/30 rounded-full blur-xl animate-pulse"></div>
+                              <div className="absolute inset-2 bg-gradient-to-br from-blue-300/20 via-purple-300/15 to-cyan-300/20 rounded-full blur-lg animate-pulse" style={{animationDelay: '0.5s'}}></div>
+                            </div>
+                            
+                            {/* Enhanced orbital elements with varied sizes and speeds */}
+                            <div className="absolute inset-0">
+                              {[...Array(6)].map((_, i) => (
+                                <div
+                                  key={`orbital-${i}`}
+                                  className={`absolute ${i % 2 === 0 ? 'w-2 h-2' : 'w-3 h-3'} bg-gradient-to-r ${
+                                    i % 3 === 0 ? 'from-blue-400 to-purple-400' : 
+                                    i % 3 === 1 ? 'from-purple-400 to-pink-400' : 
+                                    'from-cyan-400 to-blue-400'
+                                  } rounded-full opacity-80 animate-spin shadow-lg`}
+                                  style={{
+                                    top: '50%',
+                                    left: '50%',
+                                    transformOrigin: `${35 + i * 8}px 0`,
+                                    animationDelay: `${i * 1.2}s`,
+                                    animationDuration: `${6 + i * 2}s`,
+                                    transform: `translateX(-50%) translateY(-50%) rotate(${i * 60}deg) translateY(-${35 + i * 8}px)`,
+                                    boxShadow: `0 0 8px currentColor`
+                                  }}
+                                />
+                              ))}
+                            </div>
+                            
+                            {/* Data flow streams around the icon */}
+                            <div className="absolute inset-0">
+                              {[...Array(4)].map((_, i) => (
+                                <div
+                                  key={`stream-${i}`}
+                                  className="absolute w-full h-full"
+                                  style={{
+                                    transform: `rotate(${i * 90}deg)`
+                                  }}
+                                >
+                                  <div
+                                    className="absolute w-1 h-8 bg-gradient-to-t from-transparent via-blue-400/60 to-transparent rounded-full animate-pulse"
+                                    style={{
+                                      top: '10%',
+                                      left: '50%',
+                                      transform: 'translateX(-50%)',
+                                      animationDelay: `${i * 0.5}s`,
+                                      animationDuration: '3s'
+                                    }}
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          
+                          {/* Surrounding energy field */}
+                          <div className="absolute inset-0 -m-8">
+                            <div className="w-full h-full rounded-full bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-cyan-500/5 animate-pulse blur-2xl" style={{animationDuration: '4s'}}></div>
+                          </div>
+                        </div>
+                        
+                        {/* Enhanced title with effects */}
+                        <div className="mb-6">
+                          <h3 className="text-4xl font-black bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent mb-2 tracking-tight">
+                            Analysis Ready
+                          </h3>
+                          <div className="w-24 h-1 bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 mx-auto rounded-full opacity-70"></div>
+                        </div>
+                        
+                        {/* Enhanced description */}
+                        <p className="text-xl text-slate-300 leading-relaxed mb-10 max-w-md mx-auto group-hover:text-slate-200 transition-colors duration-500">
+                          Upload your documents to experience our next-generation 
+                          <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent font-semibold"> AI analysis engine</span>
+                        </p>
+                        
+                        {/* Premium feature grid with enhanced effects */}
+                        <div className="grid grid-cols-2 gap-8 mb-10">
+                          {[
+                            { 
+                              icon: (
+                                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                </svg>
+                              ), 
+                              label: 'Neural Processing', 
+                              color: 'from-blue-400 to-cyan-400',
+                              description: 'Advanced AI algorithms'
+                            },
+                            { 
+                              icon: (
+                                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                              ), 
+                              label: 'Instant Results', 
+                              color: 'from-yellow-400 to-orange-400',
+                              description: 'Lightning-fast analysis'
+                            },
+                            { 
+                              icon: (
+                                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                              ), 
+                              label: 'Precision Match', 
+                              color: 'from-emerald-400 to-teal-400',
+                              description: '99.9% accuracy rate'
+                            },
+                            { 
+                              icon: (
+                                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                              ), 
+                              label: 'Secure Process', 
+                              color: 'from-purple-400 to-pink-400',
+                              description: 'Enterprise-grade security'
+                            }
+                          ].map((feature, index) => (
+                            <div key={index} className="group/feature relative">
+                              <div className="relative p-6 rounded-2xl border border-white/10 hover:border-white/30 transition-all duration-500 hover:bg-white/5 bg-gradient-to-br from-white/5 to-transparent backdrop-blur-sm hover:backdrop-blur-md">
+                                {/* Enhanced background glow */}
+                                <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${feature.color} opacity-0 group-hover/feature:opacity-15 transition-all duration-500 blur-xl`}></div>
+                                
+                                {/* Animated border overlay */}
+                                <div className="absolute inset-0 rounded-2xl overflow-hidden">
+                                  <div className={`absolute inset-0 bg-gradient-to-r ${feature.color} opacity-0 group-hover/feature:opacity-30 transition-opacity duration-500`}
+                                       style={{
+                                         background: `conic-gradient(from 0deg, transparent, rgba(255,255,255,0.1), transparent)`,
+                                         animation: 'rotate-gradient 3s linear infinite'
+                                       }}>
+                                  </div>
+                                </div>
+                                
+                                <div className="relative z-10 flex flex-col items-center space-y-4">
+                                  {/* Enhanced icon container */}
+                                  <div className="relative">
+                                    <div className={`p-4 rounded-2xl bg-gradient-to-r ${feature.color} bg-opacity-20 text-white transition-all duration-500 group-hover/feature:scale-110 group-hover/feature:rotate-3 shadow-lg group-hover/feature:shadow-2xl`}>
+                                      {feature.icon}
+                                      
+                                      {/* Icon glow effect */}
+                                      <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${feature.color} opacity-0 group-hover/feature:opacity-50 transition-opacity duration-500 blur-lg`}></div>
+                                    </div>
+                                    
+                                    {/* Orbiting particles around icon */}
+                                    <div className="absolute inset-0 opacity-0 group-hover/feature:opacity-100 transition-opacity duration-500">
+                                      {[...Array(3)].map((_, i) => (
+                                        <div
+                                          key={`particle-${i}`}
+                                          className={`absolute w-1 h-1 bg-gradient-to-r ${feature.color} rounded-full animate-spin`}
+                                          style={{
+                                            top: '50%',
+                                            left: '50%',
+                                            transformOrigin: `${20 + i * 5}px 0`,
+                                            animationDelay: `${i * 0.5}s`,
+                                            animationDuration: `${2 + i}s`,
+                                            transform: `translateX(-50%) translateY(-50%) rotate(${i * 120}deg) translateY(-${20 + i * 5}px)`
+                                          }}
+                                        />
+                                      ))}
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Enhanced text content */}
+                                  <div className="text-center">
+                                    <span className="text-sm font-bold text-slate-200 group-hover/feature:text-white transition-colors duration-500 block mb-1">
+                                      {feature.label}
+                                    </span>
+                                    <span className="text-xs text-slate-400 group-hover/feature:text-slate-300 transition-colors duration-500 opacity-0 group-hover/feature:opacity-100 transform translate-y-2 group-hover/feature:translate-y-0">
+                                      {feature.description}
+                                    </span>
+                                  </div>
+                                </div>
+                                
+                                {/* Progress bar animation on hover */}
+                                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-white/20 to-transparent overflow-hidden">
+                                  <div className={`h-full bg-gradient-to-r ${feature.color} transform -translate-x-full group-hover/feature:translate-x-full transition-transform duration-1000 ease-out`}></div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        {/* Enhanced call to action indicator */}
+                        <div className="relative">
+                          <div className="flex items-center justify-center space-x-4 text-slate-400 group-hover:text-slate-300 transition-colors duration-500">
+                            {/* Left animated dots with wave effect */}
+                            <div className="flex space-x-1">
+                              {[...Array(4)].map((_, i) => (
+                                <div
+                                  key={`left-dot-${i}`}
+                                  className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full animate-pulse shadow-lg shadow-blue-400/50"
+                                  style={{ 
+                                    animationDelay: `${i * 0.15}s`,
+                                    animationDuration: '2s'
+                                  }}
+                                />
+                              ))}
+                            </div>
+                            
+                            {/* Central text with enhanced styling */}
+                            <div className="relative px-6 py-2 rounded-full bg-gradient-to-r from-slate-800/50 to-slate-700/50 border border-white/10 backdrop-blur-sm">
+                              <span className="text-sm font-medium bg-gradient-to-r from-slate-300 to-white bg-clip-text text-transparent">
+                                Ready for upload
+                              </span>
+                              
+                              {/* Subtle glow around text */}
+                              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-lg"></div>
+                              
+                              {/* Animated border */}
+                              <div className="absolute inset-0 rounded-full border border-gradient-to-r from-blue-400/0 via-purple-400/30 to-cyan-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            </div>
+                            
+                            {/* Right animated dots with wave effect */}
+                            <div className="flex space-x-1">
+                              {[...Array(4)].map((_, i) => (
+                                <div
+                                  key={`right-dot-${i}`}
+                                  className="w-2 h-2 bg-gradient-to-r from-purple-400 to-cyan-400 rounded-full animate-pulse shadow-lg shadow-purple-400/50"
+                                  style={{ 
+                                    animationDelay: `${0.6 + i * 0.15}s`,
+                                    animationDuration: '2s'
+                                  }}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          
+                          {/* Floating upload icon */}
+                          <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-700 group-hover:-translate-y-2">
+                            <svg className="w-5 h-5 text-blue-400 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                          </div>
+                        </div>
                       </div>
                       
-                      {/* Hover particles */}
-                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-                        {[...Array(12)].map((_, i) => (
-                          <div
-                            key={i}
-                            className="absolute w-1 h-1 bg-white rounded-full animate-particle-burst"
-                            style={{
-                              left: `${20 + Math.random() * 60}%`,
-                              top: `${20 + Math.random() * 60}%`,
-                              animationDelay: `${i * 0.1}s`
-                            }}
-                          />
-                        ))}
+                      {/* Interactive hover effects */}
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+                        {/* Animated border */}
+                        <div className="absolute inset-0 rounded-3xl border-2 border-gradient-to-r from-blue-400/50 via-purple-400/50 to-cyan-400/50 animate-pulse"></div>
+                        
+                        {/* Shimmer effect */}
+                        <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer"></div>
+                        
+                        {/* Corner accents */}
+                        <div className="absolute top-4 left-4 w-8 h-8 border-l-2 border-t-2 border-blue-400/60 rounded-tl-lg"></div>
+                        <div className="absolute top-4 right-4 w-8 h-8 border-r-2 border-t-2 border-purple-400/60 rounded-tr-lg"></div>
+                        <div className="absolute bottom-4 left-4 w-8 h-8 border-l-2 border-b-2 border-cyan-400/60 rounded-bl-lg"></div>
+                        <div className="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2 border-pink-400/60 rounded-br-lg"></div>
                       </div>
                     </div>
                     
