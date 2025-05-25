@@ -326,10 +326,10 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Enhanced grid layout */}
-            <div className="grid lg:grid-cols-2 gap-16 items-start">
+            {/* Vertical layout */}
+            <div className="flex flex-col gap-16 items-center">
               {/* Upload form section */}
-              <div className="lg:sticky lg:top-24 animate-slide-up delay-300">
+              <div className="w-full max-w-4xl mx-auto animate-slide-up delay-300">
                 <div className="relative">
                   {/* Background glow effect */}
                   <div className="absolute -inset-4 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-3xl blur-2xl opacity-50 animate-pulse"></div>
@@ -339,7 +339,7 @@ export default function Home() {
               
               {/* Results section */}
               {result ? (
-                <div className="lg:mt-0 mt-12 animate-slide-up delay-400">
+                <div className="w-full max-w-4xl mx-auto mt-12 animate-slide-up delay-400">
                   <div className="relative">
                     {/* Background glow effect for results */}
                     <div className="absolute -inset-4 bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-cyan-500/20 rounded-3xl blur-2xl opacity-50 animate-pulse"></div>
