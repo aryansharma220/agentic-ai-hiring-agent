@@ -12,7 +12,6 @@
 
 *Transform your hiring process with cutting-edge AI technology that provides intelligent resume analysis, skill gap identification, and personalized recruitment insights.*
 
-[🔥 Live Demo](https://your-demo-link.com) • [📖 Documentation](https://your-docs-link.com) • [🎯 Features](#-key-features) • [⚡ Quick Start](#-quick-start)
 
 ---
 
@@ -106,30 +105,6 @@ To bridge the gap between talent and opportunity by providing intelligent, unbia
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### **Data Flow**
-```mermaid
-graph TD
-    A[Resume Upload] --> B[PDF Parsing]
-    C[Job Description] --> D[Text Analysis]
-    B --> E[AI Processing]
-    D --> E
-    E --> F[Skill Extraction]
-    E --> G[Match Analysis]
-    E --> H[Report Generation]
-    F --> I[Results Dashboard]
-    G --> I
-    H --> I
-```
-
----
-
-## 🚀 Quick Start
-
-### **Prerequisites**
-- Node.js 18.0 or higher
-- npm or yarn package manager
-- Google Gemini API access
-
 ### **1. Clone the Repository**
 ```bash
 git clone https://github.com/your-username/ai-hiring-assistant.git
@@ -211,148 +186,6 @@ npm run dev
 
 ---
 
-## 🔧 Advanced Configuration
-
-### **Custom Skill Categories**
-```javascript
-// src/utils/skillAnalysis.js
-const customSkillCategories = {
-  technical: {
-    ai_ml: ['tensorflow', 'pytorch', 'scikit-learn'],
-    blockchain: ['solidity', 'web3', 'ethereum'],
-    // Add your custom categories
-  }
-};
-```
-
-### **AI Model Configuration**
-```javascript
-// Configure Gemini AI parameters
-const modelConfig = {
-  temperature: 0.7,
-  topK: 40,
-  topP: 0.95,
-  maxOutputTokens: 8192,
-};
-```
-
-### **Performance Optimization**
-```javascript
-// next.config.js
-module.exports = {
-  images: {
-    domains: ['your-cdn-domain.com'],
-  },
-  experimental: {
-    serverActions: true,
-  },
-  compress: true,
-};
-```
-
----
-
-## 🧪 Testing
-
-### **Run Test Suite**
-```bash
-# Unit tests
-npm run test
-
-# Integration tests
-npm run test:integration
-
-# E2E tests
-npm run test:e2e
-
-# Coverage report
-npm run test:coverage
-```
-
-### **Test Coverage Goals**
-- **Unit Tests**: 90%+ coverage
-- **Integration Tests**: Critical user flows
-- **E2E Tests**: Complete user journeys
-- **Performance Tests**: Load and stress testing
-
----
-
-## 🚀 Deployment
-
-### **Production Build**
-```bash
-# Build for production
-npm run build
-
-# Start production server
-npm start
-```
-
-### **Deployment Platforms**
-
-#### **Vercel (Recommended)**
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel --prod
-```
-
-#### **Docker Deployment**
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-EXPOSE 3000
-CMD ["npm", "start"]
-```
-
-#### **Environment Variables**
-Ensure all production environment variables are configured:
-- `GEMINI_API_KEY`
-- `NEXT_PUBLIC_APP_URL`
-- Additional security and monitoring variables
-
----
-
-## 📊 Performance Metrics
-
-- **Page Load Speed**: < 2 seconds
-- **AI Analysis Time**: < 10 seconds
-- **Mobile Performance**: 90+ Lighthouse score
-- **Accessibility**: WCAG 2.1 AA compliant
-- **SEO Optimization**: 95+ Lighthouse score
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
-
-### **Development Workflow**
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### **Code Standards**
-- ESLint and Prettier configuration
-- TypeScript for type safety
-- Component documentation
-- Test coverage requirements
-
----
-
-## 📜 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
 
 ## 🙏 Acknowledgments
 
@@ -363,22 +196,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 📞 Support & Contact
-
-- **Documentation**: [docs.ai-hiring-assistant.com](https://docs.ai-hiring-assistant.com)
-- **Issues**: [GitHub Issues](https://github.com/your-username/ai-hiring-assistant/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-username/ai-hiring-assistant/discussions)
-- **Email**: support@ai-hiring-assistant.com
-
----
 
 <div align="center">
 
 ### 🌟 Star this project if you find it helpful!
 
-**Made with ❤️ by the AI Hiring Assistant Team**
+**Made with ❤️ by Aryan Sharma
 
-[![GitHub stars](https://img.shields.io/github/stars/your-username/ai-hiring-assistant?style=social)](https://github.com/your-username/ai-hiring-assistant/stargazers)
-[![Twitter Follow](https://img.shields.io/twitter/follow/your-twitter?style=social)](https://twitter.com/your-twitter)
 
 </div>
