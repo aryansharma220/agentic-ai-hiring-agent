@@ -12,6 +12,7 @@ import Footer from '../components/Footer';
 export default function Home() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
   const [notification, setNotification] = useState(null);
 
   const showNotification = (message, type = 'info') => {
@@ -22,9 +23,30 @@ export default function Home() {
     setNotification(null);
   };
 
+  const simulateProgress = () => {
+    setLoadingProgress(0);
+    const progressSteps = [20, 40, 65, 85, 100];
+    let currentStep = 0;
+
+    const progressInterval = setInterval(() => {
+      if (currentStep < progressSteps.length) {
+        setLoadingProgress(progressSteps[currentStep]);
+        currentStep++;
+      } else {
+        clearInterval(progressInterval);
+      }
+    }, 2000); // Update every 2 seconds to match the stage transitions
+
+    return progressInterval;
+  };
+
   const handleAnalysis = async (formData) => {
     setLoading(true);
     setResult(null);
+    setLoadingProgress(0);
+    
+    // Start progress simulation
+    const progressInterval = simulateProgress();
     
     try {
       showNotification('Starting AI analysis...', 'info');
@@ -40,18 +62,21 @@ export default function Home() {
       
       const data = await response.json();
       setResult(data);
+      setLoadingProgress(100);
       showNotification('Analysis completed successfully!', 'success');
     } catch (error) {
       console.error('Error:', error);
       showNotification(error.message || 'Analysis failed. Please try again.', 'error');
     } finally {
+      clearInterval(progressInterval);
       setLoading(false);
+      setLoadingProgress(0);
     }
   };
 
   return (
     <>
-      <LoadingOverlay isVisible={loading} />
+      <LoadingOverlay isVisible={loading} progress={loadingProgress} />
       
       {notification && (
         <Notification

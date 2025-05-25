@@ -1699,3 +1699,29 @@ body {
   animation: text-gradient-shift 3s ease-in-out infinite;
   background-size: 200% 200%;
 }
+
+/* New animations for enhanced ResultCard component */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Line clamp utility */
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  line-height: 1.5;
+  max-height: calc(1.5em * 3);
+}
+
+/* Enhanced animations */
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
