@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
-import { openGmailCompose, generateCalendarInvite, openCalendarApp, exportToPDF } from "../utils/actionUtils";
+import {
+  openGmailCompose,
+  generateCalendarInvite,
+  openCalendarApp,
+  exportToPDF,
+} from "../utils/actionUtils";
+import { extractSkills, analyzeSkillGaps } from "../utils/skillAnalysis";
+import SkillGapAnalysis from "./SkillGapAnalysis";
 
 export default function ResultCard({ result }) {
   const [copied, setCopied] = useState(false);
@@ -27,6 +34,11 @@ export default function ResultCard({ result }) {
   const [exportProgress, setExportProgress] = useState(0);
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
   const [activeFeedback, setActiveFeedback] = useState(null);
+  // Skill Gap Analysis State Variables
+  const [showSkillAnalysis, setShowSkillAnalysis] = useState(false);
+  const [skillAnalysisData, setSkillAnalysisData] = useState(null);
+  const [isAnalyzingSkills, setIsAnalyzingSkills] = useState(false);
+  const [skillAnalysisError, setSkillAnalysisError] = useState(null);
   // Enhanced Interview Email Section State Variables
   const [emailTemplate, setEmailTemplate] = useState("standard");
   const [showEmailEditor, setShowEmailEditor] = useState(false);
@@ -934,7 +946,8 @@ export default function ResultCard({ result }) {
     }
 
     return () => clearTimeout(timer);
-  }, [result.score, result.summary, summaryAnalysis]);  const copyEmail = async () => {
+  }, [result.score, result.summary, summaryAnalysis]);
+  const copyEmail = async () => {
     try {
       setEmailCopyState("copying");
       // Use customized email if available, otherwise fall back to result.email
@@ -952,10 +965,61 @@ export default function ResultCard({ result }) {
       setTimeout(() => setEmailCopyState("copy"), 2000);
     }
   };
+
+  // Skill Gap Analysis Handler
+  const handleSkillAnalysis = async () => {
+    try {
+      setIsAnalyzingSkills(true);
+      setSkillAnalysisError(null);
+
+      // For demo purposes, we'll use the candidate summary as resume text
+      // In a real application, you would have access to the full resume text
+      const resumeText = result.summary || "No resume content available";
+
+      // You would normally have a job description from the hiring context
+      // For demo, we'll create a sample job description
+      const jobDescription = `
+        We are looking for a Senior Software Engineer with experience in:
+        - JavaScript, React, Node.js
+        - Python, Django, Flask
+        - AWS, Docker, Kubernetes
+        - MySQL, PostgreSQL, MongoDB
+        - Git, CI/CD, Agile methodologies
+        - Strong problem-solving and communication skills
+        - Leadership and mentoring experience
+        - Experience with microservices architecture
+        - Knowledge of security best practices
+      `;
+
+      const response = await fetch("/api/analyze-skills", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          resumeText,
+          jobDescription,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to analyze skills");
+      }
+
+      const data = await response.json();
+      setSkillAnalysisData(data.data);
+      setShowSkillAnalysis(true);
+    } catch (error) {
+      console.error("Skill analysis error:", error);
+      setSkillAnalysisError("Failed to analyze skills. Please try again.");
+    } finally {
+      setIsAnalyzingSkills(false);
+    }
+  };
   const generateCustomizedEmail = async () => {
     try {
       setIsGeneratingEmail(true);
-      
+
       const customizationOptions = {
         template: emailTemplate,
         interviewType,
@@ -968,39 +1032,38 @@ export default function ResultCard({ result }) {
         candidateScore: result.score,
         candidateName: result.name || "Candidate", // Fallback name
         position: result.position || "this position", // Fallback position
-        companyName: "Our Company" // This could be made configurable
+        companyName: "Our Company", // This could be made configurable
       };
 
-      const response = await fetch('/api/generate-email', {
-        method: 'POST',
+      const response = await fetch("/api/generate-email", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(customizationOptions),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to generate email');
+        throw new Error(errorData.error || "Failed to generate email");
       }
 
       const data = await response.json();
       setCustomizedEmail(data.email);
-      
+
       // Show success feedback
       setEmailCopyState("regenerated");
       setTimeout(() => setEmailCopyState("copy"), 2000);
-      
     } catch (error) {
-      console.error('Error generating email:', error);
-      
+      console.error("Error generating email:", error);
+
       // Show error notification
       setEmailCopyState("error");
       setTimeout(() => setEmailCopyState("copy"), 3000);
-      
+
       // Optionally show a fallback message
-      if (error.message.includes('Failed to fetch')) {
-        console.warn('Network error, using fallback email generation');
+      if (error.message.includes("Failed to fetch")) {
+        console.warn("Network error, using fallback email generation");
         // Could implement a client-side fallback here
       }
     } finally {
@@ -2460,7 +2523,8 @@ export default function ResultCard({ result }) {
                     {showEmailEditor ? "Hide Editor" : "Customize"}
                   </button>
                 </div>
-              </div>              {/* Email Preview Section */}
+              </div>{" "}
+              {/* Email Preview Section */}
               <div className="mb-6 bg-gradient-to-r from-slate-800/60 to-slate-700/60 rounded-xl p-4 border border-white/10">
                 <h4 className="text-lg font-semibold text-white mb-2 flex items-center justify-between">
                   <span className="flex items-center">
@@ -2472,7 +2536,7 @@ export default function ResultCard({ result }) {
                     )}
                   </span>
                   <div className="flex items-center space-x-2">
-                    <button 
+                    <button
                       onClick={generateCustomizedEmail}
                       disabled={isGeneratingEmail}
                       className={`text-xs font-medium px-3 py-1 rounded-lg flex items-center transition-all duration-200 ${
@@ -2483,27 +2547,52 @@ export default function ResultCard({ result }) {
                     >
                       {isGeneratingEmail ? (
                         <>
-                          <svg className="animate-spin -ml-1 mr-2 h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          <svg
+                            className="animate-spin -ml-1 mr-2 h-3 w-3"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
                           </svg>
                           Generating...
                         </>
                       ) : (
                         <>
-                          <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                          <svg
+                            className="w-3 h-3 mr-1"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
+                              clipRule="evenodd"
+                            />
                           </svg>
-                          {customizedEmail ? 'Regenerate' : 'Customize Email'}
+                          {customizedEmail ? "Regenerate" : "Customize Email"}
                         </>
                       )}
                     </button>
-                    <button 
+                    <button
                       onClick={copyEmail}
                       className={`text-xs font-medium px-3 py-1 rounded-lg flex items-center transition-all duration-200 ${
                         emailCopyState === "copying"
                           ? "bg-indigo-500/20 text-indigo-300"
-                          : emailCopyState === "copied" || emailCopyState === "regenerated"
+                          : emailCopyState === "copied" ||
+                            emailCopyState === "regenerated"
                           ? "bg-green-500/20 text-green-300"
                           : emailCopyState === "error"
                           ? "bg-red-500/20 text-red-300"
@@ -2512,36 +2601,80 @@ export default function ResultCard({ result }) {
                     >
                       {emailCopyState === "copying" ? (
                         <>
-                          <svg className="animate-spin -ml-1 mr-2 h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          <svg
+                            className="animate-spin -ml-1 mr-2 h-3 w-3"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
                           </svg>
                           Copying...
                         </>
                       ) : emailCopyState === "copied" ? (
                         <>
-                          <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                          <svg
+                            className="w-3 h-3 mr-1"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            ></path>
                           </svg>
                           Copied!
                         </>
                       ) : emailCopyState === "regenerated" ? (
                         <>
-                          <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                          <svg
+                            className="w-3 h-3 mr-1"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            ></path>
                           </svg>
                           Email Updated!
                         </>
                       ) : emailCopyState === "error" ? (
                         <>
-                          <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"></path>
+                          <svg
+                            className="w-3 h-3 mr-1"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                              clipRule="evenodd"
+                            ></path>
                           </svg>
                           Error
                         </>
                       ) : (
                         <>
-                          <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <svg
+                            className="w-3 h-3 mr-1"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
                             <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
                             <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
                           </svg>
@@ -2550,9 +2683,10 @@ export default function ResultCard({ result }) {
                       )}
                     </button>
                   </div>
-                </h4>                <div className="mt-3 p-4 bg-slate-900/70 rounded-lg border border-white/5 text-slate-300 text-sm whitespace-pre-line font-mono relative">
+                </h4>{" "}
+                <div className="mt-3 p-4 bg-slate-900/70 rounded-lg border border-white/5 text-slate-300 text-sm whitespace-pre-line font-mono relative">
                   {customizedEmail || result.email}
-                  
+
                   {/* Email Actions Overlay */}
                   <div className="absolute top-2 right-2 flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     {customizedEmail && (
@@ -2569,12 +2703,19 @@ export default function ResultCard({ result }) {
                     )}
                   </div>
                 </div>
-                
                 {customizedEmail && (
                   <div className="mt-2 text-xs text-emerald-400 flex items-center justify-between">
                     <div className="flex items-center">
-                      <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      <svg
+                        className="w-3 h-3 mr-1"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                       Email customized with {emailTemplate} template
                     </div>
@@ -2583,16 +2724,19 @@ export default function ResultCard({ result }) {
                     </div>
                   </div>
                 )}
-                
                 {/* Quick Customization Summary */}
                 {showEmailEditor && (
                   <div className="mt-3 p-3 bg-gradient-to-r from-slate-800/40 to-slate-700/40 rounded-lg border border-white/5">
-                    <h6 className="text-xs font-semibold text-slate-300 mb-2">Current Configuration:</h6>
+                    <h6 className="text-xs font-semibold text-slate-300 mb-2">
+                      Current Configuration:
+                    </h6>
                     <div className="grid grid-cols-2 gap-4 text-xs">
                       <div className="space-y-1">
                         <div className="flex justify-between">
                           <span className="text-slate-400">Template:</span>
-                          <span className="text-white capitalize">{emailTemplate}</span>
+                          <span className="text-white capitalize">
+                            {emailTemplate}
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-slate-400">Interview:</span>
@@ -2606,20 +2750,44 @@ export default function ResultCard({ result }) {
                       <div className="space-y-1">
                         <div className="flex justify-between">
                           <span className="text-slate-400">Calendar:</span>
-                          <span className={includeCalendarLink ? "text-emerald-400" : "text-red-400"}>
-                            {includeCalendarLink ? "✓ Included" : "✗ Not included"}
+                          <span
+                            className={
+                              includeCalendarLink
+                                ? "text-emerald-400"
+                                : "text-red-400"
+                            }
+                          >
+                            {includeCalendarLink
+                              ? "✓ Included"
+                              : "✗ Not included"}
                           </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-slate-400">Prep Guide:</span>
-                          <span className={includeInterviewPrep ? "text-emerald-400" : "text-red-400"}>
-                            {includeInterviewPrep ? "✓ Included" : "✗ Not included"}
+                          <span
+                            className={
+                              includeInterviewPrep
+                                ? "text-emerald-400"
+                                : "text-red-400"
+                            }
+                          >
+                            {includeInterviewPrep
+                              ? "✓ Included"
+                              : "✗ Not included"}
                           </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-slate-400">Portfolio:</span>
-                          <span className={requestPortfolio ? "text-emerald-400" : "text-red-400"}>
-                            {requestPortfolio ? "✓ Requested" : "✗ Not requested"}
+                          <span
+                            className={
+                              requestPortfolio
+                                ? "text-emerald-400"
+                                : "text-red-400"
+                            }
+                          >
+                            {requestPortfolio
+                              ? "✓ Requested"
+                              : "✗ Not requested"}
                           </span>
                         </div>
                       </div>
@@ -2627,14 +2795,22 @@ export default function ResultCard({ result }) {
                   </div>
                 )}
               </div>
-                {/* Email Template Selector */}
+              {/* Email Template Selector */}
               <div className="mb-6">
                 <label className="text-sm font-medium text-slate-300 mb-3 flex items-center justify-between">
                   <span>Choose Email Template</span>
                   {customizedEmail && (
                     <span className="text-xs text-emerald-400 flex items-center">
-                      <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      <svg
+                        className="w-3 h-3 mr-1"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                       Auto-regenerating on change
                     </span>
@@ -2647,21 +2823,21 @@ export default function ResultCard({ result }) {
                       name: "Standard Interview",
                       icon: "💼",
                       color: "blue",
-                      description: "Professional, balanced tone"
+                      description: "Professional, balanced tone",
                     },
                     {
                       id: "technical",
                       name: "Technical Deep-Dive",
                       icon: "🔧",
                       color: "purple",
-                      description: "Focus on technical skills"
+                      description: "Focus on technical skills",
                     },
                     {
                       id: "cultural",
                       name: "Cultural Fit",
                       icon: "🤝",
                       color: "emerald",
-                      description: "Emphasize team dynamics"
+                      description: "Emphasize team dynamics",
                     },
                   ].map((template) => (
                     <button
@@ -2694,7 +2870,8 @@ export default function ResultCard({ result }) {
                     </button>
                   ))}
                 </div>
-              </div>              {/* Email Customization Panel */}
+              </div>{" "}
+              {/* Email Customization Panel */}
               {showEmailEditor && (
                 <div className="mb-6 bg-slate-800/50 rounded-xl p-4 border border-white/10">
                   <h4 className="text-lg font-semibold text-white mb-4 flex items-center justify-between">
@@ -2711,16 +2888,40 @@ export default function ResultCard({ result }) {
                       >
                         {isGeneratingEmail ? (
                           <>
-                            <svg className="animate-spin -ml-1 mr-2 h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            <svg
+                              className="animate-spin -ml-1 mr-2 h-3 w-3"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              ></circle>
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                              ></path>
                             </svg>
                             Applying...
                           </>
                         ) : (
                           <>
-                            <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                            <svg
+                              className="w-3 h-3 mr-1"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
+                                clipRule="evenodd"
+                              />
                             </svg>
                             Apply Changes
                           </>
@@ -2728,7 +2929,7 @@ export default function ResultCard({ result }) {
                       </button>
                     </div>
                   </h4>
-                  
+
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
                       <label className="text-sm font-medium text-slate-300 mb-2 block">
@@ -2775,7 +2976,7 @@ export default function ResultCard({ result }) {
                       </select>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-3 mb-4">
                     <label className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg hover:bg-slate-700/70 transition-colors cursor-pointer">
                       <div className="flex items-center">
@@ -2791,13 +2992,17 @@ export default function ResultCard({ result }) {
                           className="mr-3 rounded border-slate-500 bg-slate-600 text-blue-500 focus:ring-blue-400"
                         />
                         <div>
-                          <span className="text-sm text-slate-300 font-medium">Include calendar scheduling link</span>
-                          <div className="text-xs text-slate-400">Adds calendar booking widget for convenience</div>
+                          <span className="text-sm text-slate-300 font-medium">
+                            Include calendar scheduling link
+                          </span>
+                          <div className="text-xs text-slate-400">
+                            Adds calendar booking widget for convenience
+                          </div>
                         </div>
                       </div>
                       <div className="text-lg">📅</div>
                     </label>
-                    
+
                     <label className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg hover:bg-slate-700/70 transition-colors cursor-pointer">
                       <div className="flex items-center">
                         <input
@@ -2812,13 +3017,17 @@ export default function ResultCard({ result }) {
                           className="mr-3 rounded border-slate-500 bg-slate-600 text-blue-500 focus:ring-blue-400"
                         />
                         <div>
-                          <span className="text-sm text-slate-300 font-medium">Include interview preparation guide</span>
-                          <div className="text-xs text-slate-400">Provides tips and resources for interview success</div>
+                          <span className="text-sm text-slate-300 font-medium">
+                            Include interview preparation guide
+                          </span>
+                          <div className="text-xs text-slate-400">
+                            Provides tips and resources for interview success
+                          </div>
                         </div>
                       </div>
                       <div className="text-lg">📚</div>
                     </label>
-                    
+
                     <label className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg hover:bg-slate-700/70 transition-colors cursor-pointer">
                       <div className="flex items-center">
                         <input
@@ -2833,8 +3042,12 @@ export default function ResultCard({ result }) {
                           className="mr-3 rounded border-slate-500 bg-slate-600 text-blue-500 focus:ring-blue-400"
                         />
                         <div>
-                          <span className="text-sm text-slate-300 font-medium">Request portfolio/work samples</span>
-                          <div className="text-xs text-slate-400">Asks candidate to prepare relevant work examples</div>
+                          <span className="text-sm text-slate-300 font-medium">
+                            Request portfolio/work samples
+                          </span>
+                          <div className="text-xs text-slate-400">
+                            Asks candidate to prepare relevant work examples
+                          </div>
                         </div>
                       </div>
                       <div className="text-lg">💼</div>
@@ -2844,15 +3057,28 @@ export default function ResultCard({ result }) {
                   {/* Template Preview */}
                   <div className="mt-4 p-3 bg-gradient-to-r from-indigo-900/30 to-purple-900/30 rounded-lg border border-indigo-500/20">
                     <h6 className="text-sm font-semibold text-indigo-300 mb-2 flex items-center">
-                      <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                      <svg
+                        className="w-4 h-4 mr-2"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clipRule="evenodd"
+                        />
                       </svg>
-                      Template: {emailTemplate.charAt(0).toUpperCase() + emailTemplate.slice(1)}
+                      Template:{" "}
+                      {emailTemplate.charAt(0).toUpperCase() +
+                        emailTemplate.slice(1)}
                     </h6>
                     <p className="text-xs text-slate-400 leading-relaxed">
-                      {emailTemplate === 'standard' && "Professional tone with balanced focus on skills and culture fit. Ideal for most positions."}
-                      {emailTemplate === 'technical' && "Emphasizes technical expertise and problem-solving abilities. Perfect for engineering roles."}
-                      {emailTemplate === 'cultural' && "Focuses on team dynamics and company culture alignment. Great for culture-first organizations."}
+                      {emailTemplate === "standard" &&
+                        "Professional tone with balanced focus on skills and culture fit. Ideal for most positions."}
+                      {emailTemplate === "technical" &&
+                        "Emphasizes technical expertise and problem-solving abilities. Perfect for engineering roles."}
+                      {emailTemplate === "cultural" &&
+                        "Focuses on team dynamics and company culture alignment. Great for culture-first organizations."}
                     </p>
                   </div>
                 </div>
@@ -3029,18 +3255,27 @@ export default function ResultCard({ result }) {
               {/* Enhanced Action Buttons */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  {/* Open in Gmail Button with Success State */}                  <button
+                  {/* Open in Gmail Button with Success State */}{" "}
+                  <button
                     onClick={async () => {
                       setActiveFeedback("gmail");
-                      
+
                       try {
                         // Prepare email content
-                        const subject = `Interview Feedback - ${result.name || 'Candidate'}`;
-                        const emailBody = customizedEmail || result.email || 'Interview feedback details...';
-                        
+                        const subject = `Interview Feedback - ${
+                          result.name || "Candidate"
+                        }`;
+                        const emailBody =
+                          customizedEmail ||
+                          result.email ||
+                          "Interview feedback details...";
+
                         // Open Gmail compose window
-                        const gmailResult = openGmailCompose(subject, emailBody);
-                        
+                        const gmailResult = openGmailCompose(
+                          subject,
+                          emailBody
+                        );
+
                         if (gmailResult.success) {
                           setTimeout(() => {
                             setShowSaveSuccess(true);
@@ -3050,10 +3285,12 @@ export default function ResultCard({ result }) {
                             }, 2000);
                           }, 800);
                         } else {
-                          throw new Error(gmailResult.error || 'Failed to open Gmail');
+                          throw new Error(
+                            gmailResult.error || "Failed to open Gmail"
+                          );
                         }
                       } catch (error) {
-                        console.error('Error opening Gmail:', error);
+                        console.error("Error opening Gmail:", error);
                         // Still show success for UX, but log error
                         setTimeout(() => {
                           setShowSaveSuccess(true);
@@ -3127,7 +3364,6 @@ export default function ResultCard({ result }) {
                       <span className="absolute inset-0 border-2 border-green-400 rounded-lg animate-ping opacity-75"></span>
                     )}
                   </button>
-
                   {/* Schedule Meeting Button with Share Options Panel */}
                   <div className="relative">
                     <button
@@ -3153,7 +3389,8 @@ export default function ResultCard({ result }) {
                         />
                       </svg>
                       Schedule Meeting
-                    </button>                    {/* Share Options Panel */}
+                    </button>{" "}
+                    {/* Share Options Panel */}
                     {showShareOptions && (
                       <div className="absolute bottom-full left-0 mb-2 w-64 bg-slate-800 rounded-lg border border-slate-600 shadow-xl z-10 animate-fade-in">
                         <div className="p-3 border-b border-slate-600">
@@ -3161,28 +3398,52 @@ export default function ResultCard({ result }) {
                             Share Options
                           </h6>
                         </div>
-                        <div className="p-3 space-y-2">                          <button 
+                        <div className="p-3 space-y-2">
+                          {" "}
+                          <button
                             onClick={async () => {
                               try {
                                 // Create meeting details
                                 const meetingDetails = {
-                                  title: `Interview with ${result.name || 'Candidate'}`,
-                                  description: `Interview discussion based on analysis:\n\nScore: ${result.score}%\n\nSummary: ${result.summary || 'No summary available'}`,
-                                  startDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
-                                  endDate: new Date(Date.now() + 24 * 60 * 60 * 1000 + 60 * 60 * 1000), // 1 hour duration
-                                  location: 'Video Call'
+                                  title: `Interview with ${
+                                    result.name || "Candidate"
+                                  }`,
+                                  description: `Interview discussion based on analysis:\n\nScore: ${
+                                    result.score
+                                  }%\n\nSummary: ${
+                                    result.summary || "No summary available"
+                                  }`,
+                                  startDate: new Date(
+                                    Date.now() + 24 * 60 * 60 * 1000
+                                  ), // Tomorrow
+                                  endDate: new Date(
+                                    Date.now() +
+                                      24 * 60 * 60 * 1000 +
+                                      60 * 60 * 1000
+                                  ), // 1 hour duration
+                                  location: "Video Call",
                                 };
-                                
+
                                 // Generate calendar invite and open Gmail
-                                const calendarInvite = generateCalendarInvite(meetingDetails);
-                                const subject = `Interview Invitation - ${result.name || 'Candidate'}`;
-                                const emailBody = `Hi,\n\nYou're invited to an interview meeting.\n\nMeeting Details:\n- Date: ${meetingDetails.startDate.toLocaleDateString()}\n- Time: ${meetingDetails.startDate.toLocaleTimeString()}\n- Duration: 1 hour\n- Location: ${meetingDetails.location}\n\nAdd to your calendar:\n${calendarInvite.googleCalendarUrl}\n\nBest regards`;
-                                
+                                const calendarInvite =
+                                  generateCalendarInvite(meetingDetails);
+                                const subject = `Interview Invitation - ${
+                                  result.name || "Candidate"
+                                }`;
+                                const emailBody = `Hi,\n\nYou're invited to an interview meeting.\n\nMeeting Details:\n- Date: ${meetingDetails.startDate.toLocaleDateString()}\n- Time: ${meetingDetails.startDate.toLocaleTimeString()}\n- Duration: 1 hour\n- Location: ${
+                                  meetingDetails.location
+                                }\n\nAdd to your calendar:\n${
+                                  calendarInvite.googleCalendarUrl
+                                }\n\nBest regards`;
+
                                 openGmailCompose(subject, emailBody);
                                 setShowShareOptions(false);
                                 setActiveFeedback(null);
                               } catch (error) {
-                                console.error('Error creating calendar invite:', error);
+                                console.error(
+                                  "Error creating calendar invite:",
+                                  error
+                                );
                               }
                             }}
                             className="w-full text-left px-3 py-2 text-sm text-slate-300 hover:bg-slate-700 rounded transition-colors flex items-center"
@@ -3196,26 +3457,46 @@ export default function ResultCard({ result }) {
                               <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                             </svg>
                             Email calendar invite
-                          </button>                          <button 
+                          </button>{" "}
+                          <button
                             onClick={async () => {
                               try {
                                 // Create meeting details
                                 const meetingDetails = {
-                                  title: `Interview with ${result.name || 'Candidate'}`,
-                                  description: `Interview discussion based on analysis:\n\nScore: ${result.score}%\n\nSummary: ${result.summary || 'No summary available'}`,
-                                  startDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
-                                  endDate: new Date(Date.now() + 24 * 60 * 60 * 1000 + 60 * 60 * 1000), // 1 hour duration
-                                  location: 'Video Call'
+                                  title: `Interview with ${
+                                    result.name || "Candidate"
+                                  }`,
+                                  description: `Interview discussion based on analysis:\n\nScore: ${
+                                    result.score
+                                  }%\n\nSummary: ${
+                                    result.summary || "No summary available"
+                                  }`,
+                                  startDate: new Date(
+                                    Date.now() + 24 * 60 * 60 * 1000
+                                  ), // Tomorrow
+                                  endDate: new Date(
+                                    Date.now() +
+                                      24 * 60 * 60 * 1000 +
+                                      60 * 60 * 1000
+                                  ), // 1 hour duration
+                                  location: "Video Call",
                                 };
-                                
+
                                 // Generate calendar invite and open Google Calendar
-                                const calendarInvite = generateCalendarInvite(meetingDetails);
-                                window.open(calendarInvite.googleCalendarUrl, '_blank');
-                                
+                                const calendarInvite =
+                                  generateCalendarInvite(meetingDetails);
+                                window.open(
+                                  calendarInvite.googleCalendarUrl,
+                                  "_blank"
+                                );
+
                                 setShowShareOptions(false);
                                 setActiveFeedback(null);
                               } catch (error) {
-                                console.error('Error generating calendar link:', error);
+                                console.error(
+                                  "Error generating calendar link:",
+                                  error
+                                );
                               }
                             }}
                             className="w-full text-left px-3 py-2 text-sm text-slate-300 hover:bg-slate-700 rounded transition-colors flex items-center"
@@ -3230,22 +3511,34 @@ export default function ResultCard({ result }) {
                                 d="M5 4a3 3 0 00-3 3v6a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3H5zm-1 9v-1h5v2H5a1 1 0 01-1-1zm7 1h4a1 1 0 001-1v-1h-5v2zm0-4h5V8h-5v2zM9 8H4v2h5V8z"
                                 clipRule="evenodd"
                               />
-                            </svg>                            Generate calendar link
+                            </svg>{" "}
+                            Generate calendar link
                           </button>
-                          <button 
+                          <button
                             onClick={async () => {
                               try {
                                 // Create shareable content
-                                const subject = `Candidate Analysis Shared - ${result.name || 'Candidate'}`;
-                                const shareContent = `Hi Team,\n\nI wanted to share the analysis for a recent candidate:\n\nCandidate: ${result.name || 'Not specified'}\nOverall Score: ${result.score}%\n\nSummary:\n${result.summary || 'No summary available'}\n\nPlease review and let me know your thoughts.\n\nBest regards`;
-                                
+                                const subject = `Candidate Analysis Shared - ${
+                                  result.name || "Candidate"
+                                }`;
+                                const shareContent = `Hi Team,\n\nI wanted to share the analysis for a recent candidate:\n\nCandidate: ${
+                                  result.name || "Not specified"
+                                }\nOverall Score: ${
+                                  result.score
+                                }%\n\nSummary:\n${
+                                  result.summary || "No summary available"
+                                }\n\nPlease review and let me know your thoughts.\n\nBest regards`;
+
                                 // Open Gmail compose for team sharing
                                 openGmailCompose(subject, shareContent);
-                                
+
                                 setShowShareOptions(false);
                                 setActiveFeedback(null);
                               } catch (error) {
-                                console.error('Error sharing with team:', error);
+                                console.error(
+                                  "Error sharing with team:",
+                                  error
+                                );
                               }
                             }}
                             className="w-full text-left px-3 py-2 text-sm text-slate-300 hover:bg-slate-700 rounded transition-colors flex items-center"
@@ -3272,39 +3565,94 @@ export default function ResultCard({ result }) {
                           </div>
                         </div>
                       </div>
-                    )}
+                    )}{" "}
                   </div>
-
-                  {/* Export PDF Button with Progress Indicator */}                  <button
+                  {/* Skill Gap Analysis Button */}
+                  <button
+                    onClick={handleSkillAnalysis}
+                    className={`flex items-center px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-lg hover:from-purple-600 hover:to-indigo-600 transition-all duration-200 font-medium ${
+                      isAnalyzingSkills ? "scale-95" : ""
+                    }`}
+                    disabled={isAnalyzingSkills}
+                  >
+                    {isAnalyzingSkills ? (
+                      <>
+                        <svg
+                          className="animate-spin -ml-1 mr-3 h-4 w-4 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        <span>Analyzing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg
+                          className="w-4 h-4 mr-2"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M2 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 002 2H4a2 2 0 01-2-2V5zm3 1h6v4H5V6zm6 6H5v2h6v-2z"
+                            clipRule="evenodd"
+                          />
+                          <path d="M15 7h1a2 2 0 012 2v5.5a1.5 1.5 0 01-3 0V9a1 1 0 00-1-1h-1v1a2 2 0 11-4 0V8a1 1 0 011-1h3V6a1 1 0 011-1z" />
+                        </svg>
+                        <span>Analyze Skills</span>
+                      </>
+                    )}
+                  </button>
+                  {/* Export PDF Button with Progress Indicator */}{" "}
+                  <button
                     onClick={async () => {
                       setActiveFeedback("export");
                       setShowExportOptions(true);
                       setExportProgress(0);
-                      
+
                       try {
                         // Create PDF data structure
                         const pdfData = {
-                          candidateName: result.name || 'Candidate',
+                          candidateName: result.name || "Candidate",
                           score: result.score,
-                          summary: result.summary || 'No summary available',
-                          email: result.email || 'No email provided',
+                          summary: result.summary || "No summary available",
+                          email: result.email || "No email provided",
                           analysisDate: new Date().toLocaleDateString(),
                           sections: [
                             {
-                              title: 'Overall Assessment',
-                              content: `Score: ${result.score}%\n\n${result.summary || 'No summary available'}`
+                              title: "Overall Assessment",
+                              content: `Score: ${result.score}%\n\n${
+                                result.summary || "No summary available"
+                              }`,
                             },
                             {
-                              title: 'Contact Information',
-                              content: result.email || 'No email provided'
+                              title: "Contact Information",
+                              content: result.email || "No email provided",
                             },
                             {
-                              title: 'Generated Email',
-                              content: customizedEmail || result.email || 'No email content available'
-                            }
-                          ]
+                              title: "Generated Email",
+                              content:
+                                customizedEmail ||
+                                result.email ||
+                                "No email content available",
+                            },
+                          ],
                         };
-                        
+
                         // Simulate progress while generating PDF
                         const interval = setInterval(() => {
                           setExportProgress((prev) => {
@@ -3315,24 +3663,25 @@ export default function ResultCard({ result }) {
                             return prev + 15;
                           });
                         }, 200);
-                        
+
                         // Generate PDF
                         const pdfResult = await exportToPDF(pdfData);
-                        
+
                         // Complete progress
                         setExportProgress(100);
-                        
+
                         if (pdfResult.success) {
                           setTimeout(() => {
                             setShowExportOptions(false);
                             setActiveFeedback(null);
                           }, 1000);
                         } else {
-                          throw new Error(pdfResult.error || 'PDF generation failed');
+                          throw new Error(
+                            pdfResult.error || "PDF generation failed"
+                          );
                         }
-                        
                       } catch (error) {
-                        console.error('Error exporting PDF:', error);
+                        console.error("Error exporting PDF:", error);
                         // Complete the progress bar even on error for UX
                         setExportProgress(100);
                         setTimeout(() => {
@@ -3391,9 +3740,6 @@ export default function ResultCard({ result }) {
                     )}
                   </button>
                 </div>
-                <div className="text-xs text-slate-400">
-                  Last updated: {new Date().toLocaleTimeString()}
-                </div>
               </div>
             </div>
           </div>
@@ -3403,6 +3749,12 @@ export default function ResultCard({ result }) {
       <NotesModal />
       {/* Comparison Mode */}
       <ComparisonMode />
+      {/* Skill Gap Analysis Modal */}
+      <SkillGapAnalysis
+        skillAnalysis={skillAnalysisData}
+        isVisible={showSkillAnalysis}
+        onClose={() => setShowSkillAnalysis(false)}
+      />
     </div>
   );
 }
